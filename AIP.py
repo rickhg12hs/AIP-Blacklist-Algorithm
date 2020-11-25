@@ -101,7 +101,7 @@ unknown_IP_flows_from_new_data, unknown_IPs_from_new_data, known_IP_data_flows_f
 
 write_unkown_IPs_to_data_file(unknown_IPs_from_new_data, record_file_path_to_known_IPs)
 
-update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
+update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data, current_time)
 
 
 number_of_lines = len(open(record_file_path_for_absolute_data).readlines())

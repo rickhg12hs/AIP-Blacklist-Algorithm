@@ -3,7 +3,6 @@ from datetime import datetime
 from Modules.whitelist_module import *
 import os
 
-
 def find_new_data_files(b, c):
     list_of_new_data_files = []
     list_of_data_files = os.listdir(b)
@@ -80,7 +79,7 @@ def write_unkown_IPs_to_data_file(list_of_unknown_IPs, d):
             data_file.write(flow + '\n')
 
 
-def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
+def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows, current_time):
     absolute_data, IPs_in_abs_file = open_sort_abs_file(e)
     new_absolute_file_flows = []
     new_absolute_file_flows += absolute_data
