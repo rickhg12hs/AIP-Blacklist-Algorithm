@@ -1,35 +1,8 @@
 import csv
 from datetime import datetime
-from whitelist_module import load_whitelist, check_if_ip_is_in_whitelisted_nets, check_if_ip_is_in_whitelisted_ips
+from Modules.whitelist_module import *
 import os
 
-startTime = datetime.now()
-
-# Full path to directory where all the files will be stored
-# (a)
-AIPP_direcory = os.environ['output_folder']
-
-# Full path to the  folder where the program will look for new data files. It will look in the file and only process the
-# files it has not precessed yet. It will process every file it does not recognize.
-# (b)
-folder_path_for_raw_Splunk_data = AIPP_direcory + '/Input_Data'
-
-# Full path to the file where the program will record the data files it processes
-# (c)
-record_file_path_for_processed_Splunk_files = AIPP_direcory + '/Processed_Splunk_Files.txt'
-
-# A complete list of every IP seen by the program since it was started
-# (d)
-record_file_path_to_known_IPs = AIPP_direcory + '/Known_IPs.txt'
-
-# Full path to the file where the data flows for each IP are stored. Includes all the data the program has received
-# since it was started. This is NOT the file that contains the ratings.
-# (e)
-record_file_path_for_absolute_data = AIPP_direcory + '/Absolute_Data.csv'
-
-# Full path to folder that wil contain the daily rating files. This is a FOLDER!!
-# (f)
-directory_path_historical_ratings = AIPP_direcory + '/Historical_Ratings'
 
 def find_new_data_files(b, c):
     list_of_new_data_files = []
@@ -49,13 +22,6 @@ def find_new_data_files(b, c):
     print(sorted_dates)
     return list_of_new_data_files, sorted_dates[0]
 
-# >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
-new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files)
-print('There are ', len(new_data_files), ' new data files to process')
-current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
-
-# File that will be storing the run times for this script
-time_file = AIPP_direcory + '/Times.csv'
 
 def open_sort_new_file(b, list_of_new_files):
     list_of_new_data_flows = []
@@ -172,24 +138,3 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
         wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
         for y in new_absolute_file_flows:
             wr2.writerow(y)
-
-# Now call all the functions on the data
-
-list_of_known_data_flows, list_of_known_IPs_in_data = open_sort_abs_file(record_file_path_for_absolute_data)
-
-list_of_new_data_flows, list_of_IPs_in_new_data = open_sort_new_file(folder_path_for_raw_Splunk_data, new_data_files)
-
-unknown_IP_flows_from_new_data, unknown_IPs_from_new_data, known_IP_data_flows_from_new_data, known_IPs_from_new_data\
-    = sort_IPs_from_data(list_of_known_IPs_in_data, list_of_new_data_flows)
-
-write_unkown_IPs_to_data_file(unknown_IPs_from_new_data, record_file_path_to_known_IPs)
-
-update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
-
-# Append the time that it took to a file
-with open(time_file, 'a') as new_file_another:
-        wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
-        list4 = []
-        list4.append(date)
-        list4.append(datetime.now() - startTime)
-        wr2.writerow(list4)
