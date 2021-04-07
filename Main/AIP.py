@@ -279,7 +279,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
     with open(path_to_file, 'wt', newline ='') as new_file2:
         writer = csv.DictWriter(new_file2, fieldnames=['# Top IPs from data gathered in last 24 hours only', date])
         writer.writeheader()
-        writer1 = csv.DictWriter(new_file2, fieldnames=['# Number', 'IP address', 'Rating'])
+        writer1 = csv.DictWriter(new_file2, fieldnames=['Number', 'IP address', 'Rating'])
         writer1.writeheader()
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             with open(AIPP_direcory + "log.txt", "a") as myfile:
