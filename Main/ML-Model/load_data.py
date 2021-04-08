@@ -10,12 +10,11 @@ def add_row(data):
     data['attack_duration'] = data.last_event_time - data.first_event_time
     return data
 
-def add_row_delete_row(data):
-    columns = data.copy()
-    columns.drop(['AV_Events', 'SrcAddr'], axis=1)
-    columns['attack_duration'] = columns.last_event_time - columns.first_event_time
-    print(columns)
-    return columns
+def process_old_data(csv_data_file):
+    data = pd.read_csv(csv_data_file, header='infer')
+    data['attack_duration'] = data.last_event_time - data.first_event_time
+    X_all = data.loc[:, ~data.columns.isin(['AV_Events', 'SrcAddr'])]
+    return X_all
 
 def separate_labels_data(data):
     y_all = data.Label
