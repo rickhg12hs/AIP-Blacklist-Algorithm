@@ -7,16 +7,16 @@ from sklearn.model_selection import RandomizedSearchCV
 def find_best_param(X_train, X_test, y_train, y_test):
     estimator = RandomForestClassifier()
     random_grid = {'criterion': ['entropy', 'gini'],
-                   'n_estimators': [100, 200, 300, 400, 500, 600],
-                   'max_features': ['auto', 'sqrt', 'log2'],
-                   'max_depth': [2, 5, 10, 20, 30, 40],
-                   'min_samples_split': [2, 4, 6, 8],
-                   'min_samples_leaf': [1, 2, 3, 4],
+                   'n_estimators': [100, 200],
+                   'max_features': ['auto'],
+                   'max_depth': [2, 5],
+                   'min_samples_split': [2, 4],
+                   'min_samples_leaf': [1],
                    'bootstrap': [True, False],
-                   'warm_start': [True, False],
-                   'oob_score': [True, False],
+                   'warm_start': [True],
+                   'oob_score': [True],
                    'min_impurity_decrease': [0, 0.0006, 0.0012, 0.0025, 0.005, 0.01, 0.05, 0.1]}
-    clf = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid, n_iter=400, cv=3, verbose=3,
+    clf = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid, n_iter=400, cv=2, verbose=3,
                              random_state=42, n_jobs=6)
     clf.fit(X_train, y_train)
     params = clf.best_params_
@@ -43,24 +43,22 @@ def train_on_complete_data(X_all, Y_all, X_prediction, best_params):
 
 def create_blacklist(predictions, new_ip_data):
     blacklist = []
-    for x,line in enumerate(new_ip_data):
+    del new_ip_data[0]
+    for x, line in enumerate(new_ip_data):
         if predictions[x] == 1:
             blacklist.append(line[0])
         else:
             continue
     return blacklist
 
-def create_final_blacklist(path_to_file, data_from_absolute_file):
-    with open(path_to_file, 'wt', newline ='') as new_file2:
-        writer = csv.DictWriter(new_file2, fieldnames=['Top IPs from all data, Random Forest ML model', date])
-        writer.writeheader()
-        writer1 = csv.DictWriter(new_file2, fieldnames=['Number', 'IP address', 'Rating'])
-        writer1.writeheader()
-        with open(AIPP_direcory + "log.txt", "a") as myfile:
-            myfile.write('Using Prioritize New Function')
-        for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
-            if float(interesting_rating2[1]) >= 0.002:
-                new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
-                writer1.writerows([new_entry])
-            else:
-                break
+
+# random_grid = {'criterion': ['entropy', 'gini'],
+#                    'n_estimators': [100, 200, 300, 400, 500, 600],
+#                    'max_features': ['auto', 'sqrt', 'log2'],
+#                    'max_depth': [2, 5, 10, 20, 30, 40],
+#                    'min_samples_split': [2, 4, 6, 8],
+#                    'min_samples_leaf': [1, 2, 3, 4],
+#                    'bootstrap': [True, False],
+#                    'warm_start': [True, False],
+#                    'oob_score': [True, False],
+#                    'min_impurity_decrease': [0, 0.0006, 0.0012, 0.0025, 0.005, 0.01, 0.05, 0.1]}

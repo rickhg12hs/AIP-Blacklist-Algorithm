@@ -27,22 +27,23 @@ X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
 # Process the data we will be predicting on
 no_label_data = load_data(prediction_data)
-no_label_data = add_row_delete_row(no_label_data)
-y_all_pred, X_all_pred = separate_labels_data(data)
+processed_data = add_row_delete_row(no_label_data)
 list_of_new_data_flows, list_of_IPs_in_new_data = open_sort_new_file(prediction_data)
 
+# print(processed_data)
+
 # Train a model and find good paramaters
-best_params = find_best_param(X_train, X_test, y_train, y_test)
-
-# Train a model using best params, using the whole dataset this time
-predictions = train_on_complete_data(X_all, y_all, X_all_pred, best_params)
-
-print('predictions: ', predictions)
-print('list_of_new_data_flows: ', list_of_new_data_flows)
-
-blacklist = create_blacklist(predictions, list_of_new_data_flows)
-
-print('Number of BL IPs: ', len(blacklist))
+# best_params = find_best_param(X_train, X_test, y_train, y_test)
+#
+# # Train a model using best params, using the whole dataset this time
+# predictions = train_on_complete_data(X_all, y_all, no_label_data, best_params)
+#
+# # print('predictions: ', predictions)
+# # print('list_of_new_data_flows: ', list_of_new_data_flows)
+#
+# blacklist = create_blacklist(predictions, list_of_new_data_flows)
+#
+# print('Number of BL IPs: ', len(blacklist))
 
 
 

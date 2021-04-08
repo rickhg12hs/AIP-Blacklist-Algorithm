@@ -11,15 +11,16 @@ def add_row(data):
     return data
 
 def add_row_delete_row(data):
-    data['attack_duration'] = data.last_event_time - data.first_event_time
-    data.drop('AV_Events', axis=1)
-    return data
+    columns = data.copy()
+    columns.drop(['AV_Events', 'SrcAddr'], axis=1)
+    columns['attack_duration'] = columns.last_event_time - columns.first_event_time
+    print(columns)
+    return columns
 
 def separate_labels_data(data):
     y_all = data.Label
     X_all = data.loc[:, ~data.columns.isin(['Label', 'SrcAddr'])]
     return y_all, X_all
-
 
 def bin_data(y_all, X_all):
     X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, test_size=0.33, random_state=42)
