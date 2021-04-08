@@ -3,3 +3,4 @@ Main/__pycache__/
 edna-run.sh
 automatic_run.sh
 venv/
+Main/ML-Model/__pycache__/

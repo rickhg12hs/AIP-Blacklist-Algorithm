@@ -1,8 +1,6 @@
-import csv
 from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV
-
 
 def find_best_param(X_train, X_test, y_train, y_test):
     estimator = RandomForestClassifier()
@@ -15,7 +13,7 @@ def find_best_param(X_train, X_test, y_train, y_test):
                    'bootstrap': [True, False],
                    'warm_start': [True],
                    'oob_score': [True],
-                   'min_impurity_decrease': [0, 0.0006, 0.0012, 0.0025, 0.005, 0.01, 0.05, 0.1]}
+                   'min_impurity_decrease': [0, 0.0006]}
     clf = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid, n_iter=400, cv=2, verbose=3,
                              random_state=42, n_jobs=6)
     clf.fit(X_train, y_train)
@@ -61,4 +59,15 @@ def create_blacklist(predictions, new_ip_data):
 #                    'bootstrap': [True, False],
 #                    'warm_start': [True, False],
 #                    'oob_score': [True, False],
+#                    'min_impurity_decrease': [0, 0.0006, 0.0012, 0.0025, 0.005, 0.01, 0.05, 0.1]}
+
+# random_grid = {'criterion': ['entropy', 'gini'],
+#                    'n_estimators': [100, 200],
+#                    'max_features': ['auto'],
+#                    'max_depth': [2, 5],
+#                    'min_samples_split': [2, 4],
+#                    'min_samples_leaf': [1],
+#                    'bootstrap': [True, False],
+#                    'warm_start': [True],
+#                    'oob_score': [True],
 #                    'min_impurity_decrease': [0, 0.0006, 0.0012, 0.0025, 0.005, 0.01, 0.05, 0.1]}

@@ -37,3 +37,12 @@ def open_sort_new_file(file):
                 continue
     return list_of_new_data_flows, list_of_IPs_in_new_data
 
+def write_blacklist_to_file(path_to_file, blacklist_ips):
+    with open(path_to_file, 'wt', newline ='') as new_file2:
+        writer = csv.DictWriter(new_file2, fieldnames=['# RandomForest Blacklist'])
+        writer.writeheader()
+        writer1 = csv.DictWriter(new_file2, fieldnames=['IP address'])
+        writer1.writeheader()
+        for number, ip in enumerate(blacklist_ips):
+            new_entry = {'IP address': ip}
+            writer1.writerows([new_entry])

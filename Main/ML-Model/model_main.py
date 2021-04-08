@@ -1,23 +1,9 @@
-# import os
-# import csv
-# import datetime
-# import argparse
-# import pandas as pd
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.model_selection import train_test_split
-# from sklearn import metrics
-# from sklearn.feature_selection import RFE
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.model_selection import GridSearchCV
-# from sklearn.model_selection import RandomizedSearchCV
-# import numpy as np
-# from datetime import datetime
-# import time
 from load_data import *
 from train_model import *
 
 input_data = '/home/the-shadow/Data/2021-02-01_labelled_raw.csv'
 prediction_data = '/home/the-shadow/Data/Absolute_Data.csv'
+output = '/home/the-shadow/Data/ML-Blacklist.csv'
 
 # Process the training data
 data = load_data(input_data)
@@ -36,6 +22,8 @@ best_params = find_best_param(X_train, X_test, y_train, y_test)
 predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
 
 blacklist = create_blacklist(predictions, list_of_new_data_flows)
+
+write_blacklist_to_file(output, blacklist)
 
 print('Number of BL IPs: ', len(blacklist))
 
