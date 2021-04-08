@@ -10,6 +10,11 @@ def add_row(data):
     data['attack_duration'] = data.last_event_time - data.first_event_time
     return data
 
+def add_row_delete_row(data):
+    data['attack_duration'] = data.last_event_time - data.first_event_time
+    data.drop('AV_Events', axis=1)
+    return data
+
 def separate_labels_data(data):
     y_all = data.Label
     X_all = data.loc[:, ~data.columns.isin(['Label', 'SrcAddr'])]
