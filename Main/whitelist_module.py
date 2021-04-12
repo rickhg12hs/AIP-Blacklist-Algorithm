@@ -7,8 +7,8 @@ import re
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def load_whitelist():
-    path_to_nets = dir_path + '/net-whitelist.csv'
-    path_to_ips = dir_path + '/ip-whitelist.csv'
+    path_to_nets = dir_path + '/Whitelists/net-whitelist.csv'
+    path_to_ips = dir_path + '/Whitelists/ip-whitelist.csv'
     with open(path_to_nets, 'r') as record:
         list_of_whitelisted_nets = []
         for line in csv.reader(record):

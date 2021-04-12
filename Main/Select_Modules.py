@@ -1,7 +1,7 @@
 from inspect import getmembers, isfunction
 from datetime import datetime
-import main_modulev3
-from get_functions import list_method_A_functions, list_method_B_functions, list_method_C_functions
+import linear_models
+from process_data import list_method_A_functions, list_method_B_functions, list_method_C_functions
 import os
 import csv
 
@@ -13,7 +13,7 @@ file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
 
 if manual == 1:
     # Put the options for modules in a dictionary, so user can pick which one they want
-    functions_list = [o for o in getmembers(main_modulev3) if isfunction(o[1])]
+    functions_list = [o for o in getmembers(linear_models) if isfunction(o[1])]
     # print(functions_list)
 
     dictionary_of_functions = {}
