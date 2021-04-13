@@ -4,6 +4,7 @@ import shutil
 from whitelist_module import *
 import linear_models
 from process_data import *
+from rf_ml_model import *
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -109,6 +110,9 @@ path_aging_modifier_pc = AIPP_direcory + '/Aging-modifiers-pc.csv'
 path_aging_modifier_pn = AIPP_direcory + '/Aging-modifiers-pn.csv'
 
 
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Linear Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
     absolute_data, IPs_in_abs_file = open_sort_abs_file(e)
     new_absolute_file_flows = []
@@ -118,10 +122,8 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
         new_flow2.extend([new_flow2[1]])
         unknown_IP_flows_new.append(new_flow2)
     new_absolute_file_flows.extend(unknown_IP_flows_new)
-
     if not list_of_known_new_IP_data:
         pass
-
     else:
         for x1, new_flow in enumerate(list_of_known_new_IP_data):
             for x2, absolute_flow in enumerate(new_absolute_file_flows):
@@ -152,11 +154,9 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
                     break
                 else:
                     continue
-
     with open(current_directory + '/Main/ASN/strings_to_check.csv', 'r') as read_obj:
         csv_reader = csv.reader(read_obj)
         list_of_good_organiations = list(csv_reader)
-
     asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
     whitelisted_nets, whitelisted_ips = load_whitelist()
     list_of_FPs = []
@@ -181,11 +181,9 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
                 myfile.write('Found ' + str(flow[0]) + ' ASN matches organization ' + str(entry) + ' Deleting entry...' + "\n")
         else:
             continue
-
     with open(FP_log_file, 'a') as FP_file:
         csvwriter = csv.writer(FP_file)
         csvwriter.writerows(list_of_FPs)
-
     with open(e, 'w') as new_file_another:
             wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
             for y in new_absolute_file_flows:
@@ -270,3 +268,33 @@ with open(time_file, 'a') as new_file_another:
         list4.append(date)
         list4.append(datetime.now() - startTime)
         wr2.writerow(list4)
+
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Random Forest Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+input_data = '/home/the-shadow/Data/2021-02-01_labelled_raw.csv'
+prediction_data = '/home/the-shadow/Data/Absolute_Data.csv'
+output = '/home/the-shadow/Data/ML-Blacklist.csv'
+
+# Process the training data
+data = load_data(input_data)
+data = add_row(data)
+y_all, X_all = separate_labels_data(data)
+X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+
+# Process the data we will be predicting on
+processed_data = process_old_data(prediction_data)
+list_of_new_data_flows, ips_in_data = open_sort_new_file(prediction_data)
+
+# Train a model and find good paramaters
+best_params = find_best_param(X_train, X_test, y_train, y_test)
+
+# Train a model using best params, using the whole dataset this time
+predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
+
+blacklist = create_blacklist(predictions, list_of_new_data_flows)
+
+write_blacklist_to_file(output, blacklist)
+
+print('Number of BL IPs: ', len(blacklist))
