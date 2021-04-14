@@ -4,6 +4,8 @@ import pandas as pd
 import csv
 from sklearn.model_selection import train_test_split
 import operator
+import os
+from datetime import datetime
 
 def list_method_A_functions():
     functions_list = [o[0] for o in getmembers(linear_models) if isfunction(o[1])]
@@ -144,3 +146,58 @@ def sort_data_decending(data):
     for entry in data:
         list_as_dictionary[entry[0]] = entry[1]
     return sorted(list_as_dictionary.items(), key=operator.itemgetter(1), reverse=True)
+
+
+def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use, aip_direcory, date,
+                           list_of_functions_that_were_choosen, current_time, path_to_aging_modifier):
+    with open(path_to_file, 'wt', newline ='') as new_file2:
+        writer = csv.DictWriter(new_file2, fieldnames=['# Top IPs from data gathered in last 24 hours only', date])
+        writer.writeheader()
+        writer1 = csv.DictWriter(new_file2, fieldnames=['Number', 'IP address', 'Rating'])
+        writer1.writeheader()
+        if function_to_use == getattr(linear_models, list_of_functions_that_were_choosen[1]):
+            with open(aip_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Prioritize New Function')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_to_aging_modifier))):
+                if float(interesting_rating2[1]) >= 0.002:
+                    new_entry = {'Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
+                    writer1.writerows([new_entry])
+                else:
+                    break
+        elif function_to_use == getattr(linear_models, list_of_functions_that_were_choosen[0]):
+            with open(aip_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Prioritize Consistent Function')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_to_aging_modifier))):
+                if float(interesting_rating2[1]) >= 0.057:
+                    new_entry = {'Number': x2, 'IP address': list(interesting_rating2)[0],
+                                 'Rating': interesting_rating2[1]}
+                    writer1.writerows([new_entry])
+                else:
+                    break
+        else:
+            with open(aip_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Only New IPs Function')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_to_aging_modifier))):
+                new_entry = {'Number': x2, 'IP address': list(interesting_rating2)[0],
+                             'Rating': interesting_rating2[1]}
+                writer1.writerows([new_entry])
+
+
+def find_new_data_files(b, c, AIPP_direcory):
+    list_of_new_data_files = []
+    list_of_data_files = os.listdir(b)
+    dictionary_of_dates_on_files = {}
+    with open(c, 'r') as record:
+        list_of_processed_data_files = record.read().split('\n')
+    for file in list_of_data_files:
+        if file not in list_of_processed_data_files:
+            list_of_new_data_files.extend([file])
+            dictionary_of_dates_on_files[file[0:10]] = file
+    for file12 in list_of_new_data_files:
+        with open(c, 'a') as records_file1:
+            records_file1.write(file12 + '\n')
+    sorted_dates = sorted(dictionary_of_dates_on_files, key=lambda date: datetime.strptime(date, '%Y-%m-%d'))
+    sorted_dates.reverse()
+    with open(AIPP_direcory + "log.txt", "a") as myfile:
+        myfile.write(str(sorted_dates) + "\n")
+    return list_of_new_data_files, sorted_dates[0]

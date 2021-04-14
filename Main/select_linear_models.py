@@ -1,7 +1,7 @@
 from inspect import getmembers, isfunction
 from datetime import datetime
 import linear_models
-from process_data import list_method_A_functions, list_method_B_functions, list_method_C_functions
+from data_processing_functions import list_method_A_functions, list_method_B_functions, list_method_C_functions
 import os
 import csv
 
