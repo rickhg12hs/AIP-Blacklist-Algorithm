@@ -7,6 +7,8 @@ from data_processing_functions import *
 from rf_ml_models import *
 from data_aggregation import *
 
+print('Starting main AIP script')
+
 # Full path to directory where all the files will be stored
 # (a)
 AIP_output_data_directory = os.environ['output_folder']
@@ -26,10 +28,6 @@ with open(file_for_functions, 'r') as file:
             list_of_functions_that_were_choosen.extend(line)
 
 functions_list = [o for o in getmembers(linear_models) if isfunction(o[1])]
-
-
-# >>>>>>>>> Needs to be here so it can be called immediately, fine what data
-# files have not been processed.
 
 current_directory = os.getcwd()
 
@@ -61,6 +59,7 @@ directory_path_historical_ratings = AIP_output_data_directory + '/Historical_Rat
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
 new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files,
                                            AIP_output_data_directory)
+print("New data files: ", new_data_files)
 
 with open(AIP_output_data_directory + "/log.txt", "a") as myfile:
     myfile.write('There are ' + str(len(new_data_files)) + ' new data files to process' + "\n")
@@ -97,7 +96,7 @@ path_aging_modifier_pn = AIP_output_data_directory + '/Aging-modifiers-pn.csv'
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Linear Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
+print("Starting Linear models")
 # Load the and process the Data
 
 list_of_known_data_flows, list_of_known_IPs_in_data = open_sort_abs_file(record_file_path_for_absolute_data)
@@ -149,53 +148,56 @@ with open(time_file, 'a') as new_file_another:
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Random Forest Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
-new_data_ml_models = AIP_output_data_directory + '/ML_Model_Data/new_data.csv'
-aggregate_data = AIP_output_data_directory + '/ML_Model_Data/temp_aggregate_data.csv'
-labeled_aggegate_data = AIP_output_data_directory + '/ML_Model_Data/temp_aggregate_data_labeled.csv'
-labeled_concatinated_data = AIP_output_data_directory + '/ML_Model_Data/concatinated_data_labeled.csv'
+new_24_hour_data = AIP_output_data_directory + '/ML_Model_Data/new_24_hour_data.csv'
+aggregate_data = AIP_output_data_directory + '/ML_Model_Data/aggregate_data.csv'
+aggregate_data_labeled = AIP_output_data_directory + '/ML_Model_Data/aggregate_data_labeled.csv'
+concatinated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/concatinated_data_labeled.csv'
 C_model_output = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatinated/' + date + '_rf_concatinated_backlist.csv'
 A_model_ouptut = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Aggregated/' + date + '_rf_aggregate_backlist.csv'
 
-# --------- Concatination Random Forest Model ----------
-# Process the training data
-c_data = load_data(labeled_concatinated_data)
-c_data = add_row(c_data)
-y_all, X_all = separate_labels_data(c_data)
-X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+if os.stat(aggregate_data_labeled).st_size == 0:
+    print('No label-able past data. Skipping ML models')
+else:
+    print("Starting random forest models")
 
-# Process the data we will be predicting on
-processed_data = process_old_data(new_data_ml_models)
-list_of_new_data_flows, ips_in_data_C = open_sort_new_file(new_data_ml_models)
+    # --------- Concatination Random Forest Model ----------
+    # Process the training data
+    c_data = load_data(concatinated_data_labeled)
+    c_data = add_row(c_data)
+    y_all, X_all = separate_labels_data(c_data)
+    X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
-# Train a model and find good paramaters
-best_params = find_best_param(X_train, X_test, y_train, y_test)
+    # Process the data we will be predicting on
+    processed_data = process_old_data(new_24_hour_data)
+    list_of_new_data_flows, ips_in_data_C = open_sort_new_file(new_24_hour_data)
 
-# Train a model using best params, using the whole dataset this time
-predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
+    # Train a model and find good paramaters
+    best_params = find_best_param(X_train, X_test, y_train, y_test)
 
-blacklist_C = create_blacklist(predictions, list_of_new_data_flows)
+    # Train a model using best params, using the whole dataset this time
+    predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
 
-write_blacklist_to_file(C_model_output, blacklist_C)
+    blacklist_C = create_blacklist(predictions, list_of_new_data_flows)
 
+    write_blacklist_to_file(C_model_output, blacklist_C)
 
-# --------- Aggregation Random Forest Model ----------
-# Process the training data
-a_data = load_data(labeled_aggegate_data)
-a_data = add_row(a_data)
-y_all, X_all = separate_labels_data(a_data)
-X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+    # --------- Aggregation Random Forest Model ----------
+    # Process the training data
+    a_data = load_data(aggregate_data_labeled)
+    a_data = add_row(a_data)
+    y_all, X_all = separate_labels_data(a_data)
+    X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
-# Process the data we will be predicting on
-processed_data = process_old_data(aggregate_data)
-list_of_new_data_flows, ips_in_data_A = open_sort_new_file(aggregate_data)
+    # Process the data we will be predicting on
+    processed_data = process_old_data(aggregate_data)
+    list_of_new_data_flows, ips_in_data_A = open_sort_new_file(aggregate_data)
 
-# Train a model and find good paramaters
-best_params = find_best_param(X_train, X_test, y_train, y_test)
+    # Train a model and find good paramaters
+    best_params = find_best_param(X_train, X_test, y_train, y_test)
 
-# Train a model using best params, using the whole dataset this time
-predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
+    # Train a model using best params, using the whole dataset this time
+    predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
 
-blacklist_A = create_blacklist(predictions, list_of_new_data_flows)
+    blacklist_A = create_blacklist(predictions, list_of_new_data_flows)
 
-write_blacklist_to_file(A_model_ouptut, blacklist_A)
+    write_blacklist_to_file(A_model_ouptut, blacklist_A)
