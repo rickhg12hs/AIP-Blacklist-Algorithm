@@ -106,6 +106,8 @@ def open_sort_abs_file(e):
         for line in csv.reader(csvfile):
             if not line:
                 break
+            elif line[0] == 'SrcAddr':
+                continue
             else:
                 IP_flows.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10]])
                 IPs_in_absolute_file.append(line[0])
@@ -117,6 +119,8 @@ def get_updated_flows(location_of_absolute_data_file):
         for line in csv.reader(csvfile):
             if not line:
                 break
+            elif line[0] == 'SrcAddr':
+                continue
             else:
                 IP_flows.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10]])
     return IP_flows

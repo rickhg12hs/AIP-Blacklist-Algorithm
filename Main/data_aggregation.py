@@ -75,5 +75,8 @@ def update_records_files(path_to_historical_data, list_of_known_new_IP_data, unk
         csvwriter.writerows(list_of_FPs)
     with open(path_to_historical_data, 'w') as new_file_another:
             wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
+            Labels = ["SrcAddr","total_events","total_duration","average_duration","total_bytes","average_bytes",
+                      "total_packets","average_packets","last_event_time", "first_event_time", "average_events"]
+            wr2.writerow(Labels)
             for y in new_absolute_file_flows:
                 wr2.writerow(y)
