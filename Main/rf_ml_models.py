@@ -5,15 +5,15 @@ from sklearn.model_selection import RandomizedSearchCV
 def find_best_param(X_train, X_test, y_train, y_test):
     estimator = RandomForestClassifier()
     random_grid = {'criterion': ['entropy', 'gini'],
-                   'n_estimators': [100, 200],
-                   'max_features': ['auto'],
-                   'max_depth': [2, 5],
-                   'min_samples_split': [2, 4],
-                   'min_samples_leaf': [1],
+                   'n_estimators': [100, 400, 800],
+                   'max_features': ['auto', 'sqrt', 'log2'],
+                   'max_depth': [10, 20, 30],
+                   'min_samples_split': [2, 8, 16],
+                   'min_samples_leaf': [1, 5, 10],
                    'bootstrap': [True, False],
-                   'warm_start': [True],
-                   'oob_score': [True],
-                   'min_impurity_decrease': [0.0025, 0.005, 0.01, 0.05, 0.1]}
+                   'warm_start': [True, False],
+                   'oob_score': [True, False],
+                   'min_impurity_decrease': [0.0001, 0.001, 0.01, 0.1]}
     clf = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid, n_iter=400, cv=2, verbose=3,
                              random_state=42, n_jobs=6)
     clf.fit(X_train, y_train)
