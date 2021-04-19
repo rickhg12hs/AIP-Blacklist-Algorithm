@@ -1,6 +1,9 @@
 from inspect import getmembers, isfunction
 from datetime import datetime
 import shutil
+
+import pandas as pd
+
 from whitelist_module import *
 import linear_models
 from data_processing_functions import *
@@ -133,6 +136,111 @@ create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF, 
 
 shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
 
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Random Forest Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+new_24_hour_data = AIP_output_data_directory + '/ML_Model_Data/new_24_hour_data.csv'
+previous_24_hour_data = AIP_output_data_directory + '/ML_Model_Data/previous_24_hour_data.csv'
+concatenated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/concatenated_data_labeled.csv'
+previous_24_hour_data_labeled = AIP_output_data_directory + '/ML_Model_Data/previous_24_hour_data_labeled.csv'
+C_model_output_1_day = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatenated_1_day/' + date + '_rf_concatenated_backlist_1_day.csv'
+C_model_output_2_day = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatenated_2_day/' + date + '_rf_concatenated_backlist_2_day.csv'
+A_model_ouptut = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Aggregated/' + date + '_rf_aggregate_backlist.csv'
+
+if os.stat(previous_24_hour_data_labeled).st_size == 0:
+    print('No label-able past data. Skipping ML models')
+else:
+    print("Starting random forest models")
+    print("Concatenation Model")
+    # --------- Concatenation Random Forest Model ----------
+    # Process the training data
+    if os.stat(concatenated_data_labeled).st_size == 0:
+        c_data_new = load_data(previous_24_hour_data_labeled)
+        c_data_new = add_row(c_data_new)
+        y_all, X_all = separate_labels_data(c_data_new)
+        X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+
+        # Process the data we will be predicting on
+        first_day_for_predictions = process_old_data(new_24_hour_data)
+        second_day_for_predictions = process_old_data(previous_24_hour_data)
+        two_day_combined_data = combine_data_pandas(first_day_for_predictions, second_day_for_predictions)
+
+        first_day_for_ips = load_data(new_24_hour_data)
+        second_day_for_ips = load_data(previous_24_hour_data)
+        two_day_combined_data_ips = combine_data_pandas(first_day_for_ips, second_day_for_ips)
+        one_day_ips = extract_ips_from_pandas_dataframe(first_day_for_ips)
+        two_day_ips = extract_ips_from_pandas_dataframe(two_day_combined_data_ips)
+
+        # Train a model and find good paramaters
+        best_params = find_best_param(X_train, X_test, y_train, y_test)
+
+        # Train a model using best params, using the whole dataset this time
+        predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
+        predictions_2_day = train_on_complete_data(X_all, y_all, two_day_combined_data, best_params)
+
+        blacklist_C_1_day = create_blacklist(predictions_1_day, one_day_ips)
+        blacklist_C_2_day = create_blacklist(predictions_2_day, two_day_ips)
+
+        write_blacklist_to_file(C_model_output_1_day, blacklist_C_1_day)
+        write_blacklist_to_file(C_model_output_2_day, blacklist_C_2_day)
+
+        c_data_new.to_csv(concatenated_data_labeled, index=False)
+    else:
+        c_data_historical = load_data(concatenated_data_labeled)
+        c_data_new = load_data(previous_24_hour_data_labeled)
+        c_data_new = add_row(c_data_new)
+        combined_data = combine_data_pandas(c_data_historical, c_data_new)
+        y_all, X_all = separate_labels_data(combined_data)
+        X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+
+        # Process the data we will be predicting on
+        first_day_for_predictions = process_old_data(new_24_hour_data)
+        second_day_for_predictions = process_old_data(previous_24_hour_data)
+        two_day_combined_data = combine_data_pandas(first_day_for_predictions, second_day_for_predictions)
+
+        first_day_for_ips = load_data(new_24_hour_data)
+        second_day_for_ips = load_data(previous_24_hour_data)
+        two_day_combined_data_ips = combine_data_pandas(first_day_for_ips, second_day_for_ips)
+        one_day_ips = extract_ips_from_pandas_dataframe(first_day_for_ips)
+        two_day_ips = extract_ips_from_pandas_dataframe(two_day_combined_data_ips)
+
+        # Train a model and find good paramaters
+        best_params = find_best_param(X_train, X_test, y_train, y_test)
+
+        # Train a model using best params, using the whole dataset this time
+        predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
+        predictions_2_day = train_on_complete_data(X_all, y_all, two_day_combined_data, best_params)
+
+        blacklist_C_1_day = create_blacklist(predictions_1_day, one_day_ips)
+        blacklist_C_2_day = create_blacklist(predictions_2_day, two_day_ips)
+
+        write_blacklist_to_file(C_model_output_1_day, blacklist_C_1_day)
+        write_blacklist_to_file(C_model_output_2_day, blacklist_C_2_day)
+
+        combined_data.to_csv(concatenated_data_labeled, index=False)
+
+    # print("Aggregation Model")
+    # # --------- Aggregation Random Forest Model ----------
+    # # Process the training data
+    # a_data = load_data(aggregate_data_labeled)
+    # a_data = add_row(a_data)
+    # y_all, X_all = separate_labels_data(a_data)
+    # X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
+    #
+    # # Process the data we will be predicting on
+    # processed_data = process_old_data(aggregate_data)
+    # list_of_new_data_flows, ips_in_data_A = open_sort_new_file(aggregate_data)
+    #
+    # # Train a model and find good paramaters
+    # best_params = find_best_param(X_train, X_test, y_train, y_test)
+    #
+    # # Train a model using best params, using the whole dataset this time
+    # predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
+    #
+    # blacklist_A = create_blacklist(predictions, list_of_new_data_flows)
+    #
+    # write_blacklist_to_file(A_model_ouptut, blacklist_A)
+
 with open(AIP_output_data_directory + "/log.txt", "a") as myfile:
     myfile.write('Total Runtime' + str(datetime.now() - startTime) + "\n")
     myfile.write('---------------- AIP run complete ----------------' + "\n")
@@ -144,63 +252,3 @@ with open(time_file, 'a') as new_file_another:
         list4.append(date)
         list4.append(datetime.now() - startTime)
         wr2.writerow(list4)
-
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Random Forest Models <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-new_24_hour_data = AIP_output_data_directory + '/ML_Model_Data/new_24_hour_data.csv'
-aggregate_data = AIP_output_data_directory + '/ML_Model_Data/aggregate_data.csv'
-aggregate_data_labeled = AIP_output_data_directory + '/ML_Model_Data/aggregate_data_labeled.csv'
-concatinated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/concatinated_data_labeled.csv'
-new_concatinated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/previous_24_hour_data_labeled.csv'
-C_model_output = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatinated/' + date + '_rf_concatinated_backlist.csv'
-A_model_ouptut = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Aggregated/' + date + '_rf_aggregate_backlist.csv'
-
-if os.stat(aggregate_data_labeled).st_size == 0:
-    print('No label-able past data. Skipping ML models')
-else:
-    print("Starting random forest models")
-    print("Concatination Model")
-    # --------- Concatination Random Forest Model ----------
-    # Process the training data
-    c_data_historical = load_data(concatinated_data_labeled)
-    c_data_new = load_data(new_concatinated_data_labeled)
-    c_data = add_row(c_data)
-    y_all, X_all = separate_labels_data(c_data)
-    X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
-
-    # Process the data we will be predicting on
-    processed_data = process_old_data(new_24_hour_data)
-    list_of_new_data_flows, ips_in_data_C = open_sort_new_file(new_24_hour_data)
-
-    # Train a model and find good paramaters
-    best_params = find_best_param(X_train, X_test, y_train, y_test)
-
-    # Train a model using best params, using the whole dataset this time
-    predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
-
-    blacklist_C = create_blacklist(predictions, list_of_new_data_flows)
-
-    write_blacklist_to_file(C_model_output, blacklist_C)
-
-    print("Aggregation Model")
-    # --------- Aggregation Random Forest Model ----------
-    # Process the training data
-    a_data = load_data(aggregate_data_labeled)
-    a_data = add_row(a_data)
-    y_all, X_all = separate_labels_data(a_data)
-    X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
-
-    # Process the data we will be predicting on
-    processed_data = process_old_data(aggregate_data)
-    list_of_new_data_flows, ips_in_data_A = open_sort_new_file(aggregate_data)
-
-    # Train a model and find good paramaters
-    best_params = find_best_param(X_train, X_test, y_train, y_test)
-
-    # Train a model using best params, using the whole dataset this time
-    predictions = train_on_complete_data(X_all, y_all, processed_data, best_params)
-
-    blacklist_A = create_blacklist(predictions, list_of_new_data_flows)
-
-    write_blacklist_to_file(A_model_ouptut, blacklist_A)

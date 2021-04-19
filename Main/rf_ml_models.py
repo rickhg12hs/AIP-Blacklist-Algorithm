@@ -13,7 +13,7 @@ def find_best_param(X_train, X_test, y_train, y_test):
                    'bootstrap': [True, False],
                    'warm_start': [True],
                    'oob_score': [True],
-                   'min_impurity_decrease': [0, 0.0006]}
+                   'min_impurity_decrease': [0.0025, 0.005, 0.01, 0.05, 0.1]}
     clf = RandomizedSearchCV(estimator=estimator, param_distributions=random_grid, n_iter=400, cv=2, verbose=3,
                              random_state=42, n_jobs=6)
     clf.fit(X_train, y_train)
@@ -39,12 +39,11 @@ def train_on_complete_data(X_all, Y_all, X_prediction, best_params):
     predictions = classifier.predict(X_prediction)
     return predictions
 
-def create_blacklist(predictions, new_ip_data):
+def create_blacklist(predictions, ips):
     blacklist = []
-    del new_ip_data[0]
-    for x, line in enumerate(new_ip_data):
+    for x, line in enumerate(ips):
         if predictions[x] == 1:
-            blacklist.append(line[0])
+            blacklist.append(line)
         else:
             continue
     return blacklist

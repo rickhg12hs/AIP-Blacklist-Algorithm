@@ -41,15 +41,15 @@ then
 				mkdir $output_folder/Historical_Ratings/Prioritize_New/
 				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
 				mkdir $output_folder/Historical_Ratings/Traditional/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Aggregated/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatinated/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
 				touch $output_folder/ML_Model_Data/new_24_hour_data.csv
 				touch $output_folder/ML_Model_Data/previous_24_hour_data.csv
 				touch $output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv
-				touch $output_folder/ML_Model_Data/concatinated_data_labeled.csv
+				touch $output_folder/ML_Model_Data/concatenated_data_labeled.csv
 				touch $output_folder/ML_Model_Data/temp.csv
 				touch $output_folder/Absolute_Data.csv
 				touch $output_folder/Known_IPs.txt
@@ -70,15 +70,15 @@ then
 				mkdir $output_folder/Historical_Ratings/Prioritize_New/
 				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
 				mkdir $output_folder/Historical_Ratings/Traditional/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Aggregated/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatinated/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
 				touch $output_folder/ML_Model_Data/new_24_hour_data.csv
 				touch $output_folder/ML_Model_Data/previous_24_hour_data.csv
 				touch $output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv
-				touch $output_folder/ML_Model_Data/concatinated_data_labeled.csv
+				touch $output_folder/ML_Model_Data/concatenated_data_labeled.csv
 				touch $output_folder/ML_Model_Data/temp.csv
 				touch $output_folder/Absolute_Data.csv
 				touch $output_folder/FP_log_file.csv
@@ -112,9 +112,9 @@ for entry in $input_data_folder/*
 do
    # Copy the aggregated data from the previous run to the ML model folder. This is the data for the aggregate ml model that
    # needs to be labeled with the new data file, and then used for training.
-   cp $output_folder/Absolute_Data.csv $output_folder/ML_Model_Data/aggregate_data.csv
+#   cp $output_folder/Absolute_Data.csv $output_folder/ML_Model_Data/aggregate_data.csv
 #   Copy the current new data file to the ML model folder, overridding the previous one. This will be used to label the aggregated data for the aggregated model,
-#   and used to label the previous unlabeled day data for the concatination model.
+#   and used to label the previous unlabeled day data for the concatenation model.
    cp $entry $output_folder/ML_Model_Data/new_24_hour_data.csv
    # Copy the current new data file to the input Data folder. This is not labeled, coming directly from the argus data
    cp $entry $output_folder/Input_Data/
@@ -123,11 +123,13 @@ do
 #   Run the label data script. This will:
 #   1) Label the previous aggregated data using the new data file
 #   2) Label the previous new data file using the current new data file, and append this to the end of the historical
-#   concatinated_data_labeled file.
-   if [ ! -s "$output_folder/ML_Model_Data/aggregate_data.csv" ]
+#   concatenated_data_labeled file.
+   if [ ! -s "$output_folder/ML_Model_Data/previous_24_hour_data.csv" ]
    then
         echo No past data yet, skipping ML models to next time
    else
+        rm "$output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv"
+        touch "$output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv"
         echo labeling data ....
         $directory_of_AIP/Main/ML-Model/label_data.sh
         echo finished .....
@@ -136,7 +138,7 @@ do
 #   1) Find the new file in the input directory
 #   2) Aggregate this new data with the historical data
 #   3) Run the Linear models on the updated historical data
-#   4) Train and run the two Random Forest models using the labeled aggregated data and the labeled concatinated data
+#   4) Train and run the two Random Forest models using the labeled aggregated data and the labeled concatenated data
    python3 $directory_of_AIP/Main/AIP.py
 #   Save the new_data.csv file to previous_unlabeled_data.csv, so that it can be used in the next run
    cp $output_folder/ML_Model_Data/new_24_hour_data.csv $output_folder/ML_Model_Data/previous_24_hour_data.csv
