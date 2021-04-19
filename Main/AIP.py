@@ -1,9 +1,7 @@
 from inspect import getmembers, isfunction
 from datetime import datetime
 import shutil
-
 import pandas as pd
-
 from whitelist_module import *
 import linear_models
 from data_processing_functions import *
@@ -173,6 +171,8 @@ else:
 
         # Train a model and find good paramaters
         best_params = find_best_param(X_train, X_test, y_train, y_test)
+        with open(AIP_output_data_directory + "/paramaters.txt", "a") as myfile:
+            myfile.write(best_params)
 
         # Train a model using best params, using the whole dataset this time
         predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
@@ -206,6 +206,8 @@ else:
 
         # Train a model and find good paramaters
         best_params = find_best_param(X_train, X_test, y_train, y_test)
+        with open(AIP_output_data_directory + "/paramaters.txt", "a") as myfile:
+            myfile.write(best_params)
 
         # Train a model using best params, using the whole dataset this time
         predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
