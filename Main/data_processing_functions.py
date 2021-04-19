@@ -40,6 +40,12 @@ def list_method_C_functions():
             running_total += 1
     return dictionary_of_options
 
+def combine_data_pandas(data1, data2):
+    frames = [data1, data2]
+    df_12 = pd.concat(frames)
+    return df_12
+
+
 def load_data(csv_data_file):
     data = pd.read_csv(csv_data_file, header='infer')
     return data

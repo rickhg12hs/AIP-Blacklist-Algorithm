@@ -152,6 +152,7 @@ new_24_hour_data = AIP_output_data_directory + '/ML_Model_Data/new_24_hour_data.
 aggregate_data = AIP_output_data_directory + '/ML_Model_Data/aggregate_data.csv'
 aggregate_data_labeled = AIP_output_data_directory + '/ML_Model_Data/aggregate_data_labeled.csv'
 concatinated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/concatinated_data_labeled.csv'
+new_concatinated_data_labeled = AIP_output_data_directory + '/ML_Model_Data/previous_24_hour_data_labeled.csv'
 C_model_output = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatinated/' + date + '_rf_concatinated_backlist.csv'
 A_model_ouptut = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Aggregated/' + date + '_rf_aggregate_backlist.csv'
 
@@ -159,10 +160,11 @@ if os.stat(aggregate_data_labeled).st_size == 0:
     print('No label-able past data. Skipping ML models')
 else:
     print("Starting random forest models")
-
+    print("Concatination Model")
     # --------- Concatination Random Forest Model ----------
     # Process the training data
-    c_data = load_data(concatinated_data_labeled)
+    c_data_historical = load_data(concatinated_data_labeled)
+    c_data_new = load_data(new_concatinated_data_labeled)
     c_data = add_row(c_data)
     y_all, X_all = separate_labels_data(c_data)
     X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
@@ -181,6 +183,7 @@ else:
 
     write_blacklist_to_file(C_model_output, blacklist_C)
 
+    print("Aggregation Model")
     # --------- Aggregation Random Forest Model ----------
     # Process the training data
     a_data = load_data(aggregate_data_labeled)
