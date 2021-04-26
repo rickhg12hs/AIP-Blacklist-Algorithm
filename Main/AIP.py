@@ -206,12 +206,13 @@ else:
         c_data_new = load_data(previous_24_hour_data_labeled)
         c_data_new = add_row(c_data_new)
         combined_data = combine_data_pandas(c_data_historical, c_data_new)
-        if days_in_historical_data > 30:
+        if days_in_historical_data - 1 > 30:
             lines_to_drop = len(combined_data)/(days_in_historical_data - 1)
             combined_data.drop(pd.Series(np.arange(0, lines_to_drop, 1)))
+            print("Dropped", lines_to_drop, ' lines')
         else:
             print("Days in Data: ", days_in_historical_data)
-            
+
         y_all, X_all = separate_labels_data(combined_data)
         X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
