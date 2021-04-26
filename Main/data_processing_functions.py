@@ -45,6 +45,8 @@ def combine_data_pandas(data1, data2):
     df_12 = pd.concat(frames)
     return df_12
 
+def return_rows_by_index(data_frame, start_index):
+    return data_frame.iloc[start_index:]
 
 def load_data(csv_data_file):
     data = pd.read_csv(csv_data_file, header='infer')

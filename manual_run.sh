@@ -43,6 +43,14 @@ then
 				mkdir $output_folder/Historical_Ratings/Traditional/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_3_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_4_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_5_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_6_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_7_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_8_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_9_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_10_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
@@ -72,6 +80,14 @@ then
 				mkdir $output_folder/Historical_Ratings/Traditional/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_3_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_4_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_5_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_6_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_7_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_8_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_9_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_10_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
