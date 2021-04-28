@@ -207,7 +207,7 @@ else:
         c_data_new = add_row(c_data_new)
         combined_data = combine_data_pandas(c_data_historical, c_data_new)
         if days_in_historical_data - 1 > 30:
-            lines_to_drop = len(combined_data)/(days_in_historical_data - 1)
+            lines_to_drop = len(combined_data)//30
             combined_data.drop(pd.Series(np.arange(0, lines_to_drop, 1)))
             print("Dropped", lines_to_drop, ' lines')
         else:
