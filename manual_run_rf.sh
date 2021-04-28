@@ -4,6 +4,8 @@ answer2="No"
 answer3="1"
 answer4="2"
 
+echo You are now running the Random Forest model version of AIP
+
 echo "............................"
 echo "Please Select a option from the menu[1,2]:"
 echo "(1) New Instance, create ouput folder and folders"
@@ -37,20 +39,15 @@ then
 		  	mkdir $output_folder
 				mkdir $output_folder/Input_Data/
 				mkdir $output_folder/Historical_Ratings/
-				mkdir $output_folder/Historical_Ratings/Prioritize_Consistent/
-				mkdir $output_folder/Historical_Ratings/Prioritize_New/
-				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
-				mkdir $output_folder/Historical_Ratings/Traditional/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_3_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_4_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_5_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_6_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_7_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_8_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_9_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_10_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_13_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_16_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_19_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_22_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_25_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
@@ -59,35 +56,26 @@ then
 				touch $output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv
 				touch $output_folder/ML_Model_Data/concatenated_data_labeled.csv
 				touch $output_folder/ML_Model_Data/temp.csv
-				touch $output_folder/Absolute_Data.csv
 				touch $output_folder/Known_IPs.txt
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
-				touch $output_folder/Selected_modules.csv
 				touch $output_folder/FP_log_file.csv
 				touch $output_folder/log.txt
-        touch $output_folder/Aging-modifiers-pc.csv
-        touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
 		  then
 		  	echo Input different location:
 		  	read output_folder
 				mkdir $output_folder/Historical_Ratings/
 				mkdir $output_folder/Input_Data/
-				mkdir $output_folder/Historical_Ratings/Prioritize_Consistent/
-				mkdir $output_folder/Historical_Ratings/Prioritize_New/
-				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
-				mkdir $output_folder/Historical_Ratings/Traditional/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_1_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_2_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_3_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_4_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_5_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_6_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_7_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_8_day/
-				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_9_day/
 				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_10_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_13_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_16_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_19_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_22_day/
+				mkdir $output_folder/Historical_Ratings/Random_Forest_Concatenated_25_day/
 				mkdir $output_folder/ML_Model_Data/
 				touch $output_folder/ML_Model_Data/aggregate_data_labeled.csv
 				touch $output_folder/ML_Model_Data/aggregate_data.csv
@@ -96,13 +84,11 @@ then
 				touch $output_folder/ML_Model_Data/previous_24_hour_data_labeled.csv
 				touch $output_folder/ML_Model_Data/concatenated_data_labeled.csv
 				touch $output_folder/ML_Model_Data/temp.csv
-				touch $output_folder/Absolute_Data.csv
 				touch $output_folder/FP_log_file.csv
 				touch $output_folder/log.txt
 				touch $output_folder/Known_IPs.txt
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
-				touch $output_folder/Selected_modules.csv
 		  else
 		  	continue
 			echo ............................
@@ -115,7 +101,7 @@ then
 fi
 
 
-# Export all variables so they can be accessed by AIP.py
+# Export all variables so they can be accessed by AIP_Linear.py
 export output_folder
 export input_data_folder
 
@@ -155,10 +141,9 @@ do
 #   2) Aggregate this new data with the historical data
 #   3) Run the Linear models on the updated historical data
 #   4) Train and run the two Random Forest models using the labeled aggregated data and the labeled concatenated data
-   python3 $directory_of_AIP/Main/AIP.py
+   python3 $directory_of_AIP/Main/AIP_RF.py
 #   Save the new_data.csv file to previous_unlabeled_data.csv, so that it can be used in the next run
    cp $output_folder/ML_Model_Data/new_24_hour_data.csv $output_folder/ML_Model_Data/previous_24_hour_data.csv
 #   Remove the current new data file from the folder. This is so that next this script is run, we dont loop thrpugh all the
 #   data files again
-   rm $entry
 done

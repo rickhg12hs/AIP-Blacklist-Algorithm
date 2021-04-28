@@ -6,7 +6,7 @@ output_folder=
 # Please Input location of input data files
 input_data_folder=
 
-# Export all variables so they can be accessed by AIP.py
+# Export all variables so they can be accessed by AIP_Linear.py
 export output_folder
 export input_data_folder
 
