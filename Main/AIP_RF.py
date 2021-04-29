@@ -203,7 +203,7 @@ else:
             combined_data.drop(pd.Series(np.arange(0, lines_to_drop, 1)))
             print("Dropped", lines_to_drop, ' lines')
             with open(AIP_output_data_directory + '/ML_Model_Data/dropped_lines.txt', "a") as myfile:
-                myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining')
+                myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining\n')
         else:
             print("Days in Data: ", days_in_historical_data)
 
