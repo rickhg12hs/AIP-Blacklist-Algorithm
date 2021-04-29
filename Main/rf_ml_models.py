@@ -24,17 +24,27 @@ def find_best_param(X_train, X_test, y_train, y_test):
     print("Accuracy", metrics.accuracy_score(y_test, y_pred))
     return params
 
-def train_on_complete_data(X_all, Y_all, X_prediction, best_params):
-    classifier = RandomForestClassifier(warm_start = best_params['warm_start'],
-                                        oob_score = best_params['oob_score'],
-                                        n_estimators = best_params['n_estimators'],
-                                        min_samples_split = best_params['min_samples_split'],
-                                        min_samples_leaf = best_params['min_samples_leaf'],
-                                        min_impurity_decrease = best_params['min_impurity_decrease'],
-                                        max_features = best_params['max_features'],
-                                        max_depth = best_params['max_depth'],
-                                        criterion = best_params['criterion'],
-                                        bootstrap = best_params['bootstrap'])
+def train_on_complete_data(X_all, Y_all, X_prediction):
+    # classifier = RandomForestClassifier(warm_start = best_params['warm_start'],
+    #                                     oob_score = best_params['oob_score'],
+    #                                     n_estimators = best_params['n_estimators'],
+    #                                     min_samples_split = best_params['min_samples_split'],
+    #                                     min_samples_leaf = best_params['min_samples_leaf'],
+    #                                     min_impurity_decrease = best_params['min_impurity_decrease'],
+    #                                     max_features = best_params['max_features'],
+    #                                     max_depth = best_params['max_depth'],
+    #                                     criterion = best_params['criterion'],
+    #                                     bootstrap = best_params['bootstrap'])
+    classifier = RandomForestClassifier(warm_start = True,
+                                        oob_score = False,
+                                        n_estimators = 150,
+                                        min_samples_split = 4,
+                                        min_samples_leaf = 3,
+                                        min_impurity_decrease = 0.0012,
+                                        max_features = 'log2',
+                                        max_depth = 20,
+                                        criterion = 'entropy',
+                                        bootstrap = True)
     classifier.fit(X_all, Y_all)
     predictions = classifier.predict(X_prediction)
     return predictions

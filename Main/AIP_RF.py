@@ -177,12 +177,12 @@ else:
         ips = extract_ips_from_pandas_dataframe(first_day_for_ips)
 
         # Train a model and find good paramaters
-        best_params = find_best_param(X_train, X_test, y_train, y_test)
+        #best_params = find_best_param(X_train, X_test, y_train, y_test)
         # with open(AIP_output_data_directory + "/paramaters.txt", "a") as myfile:
         #    myfile.write(best_params)
 
         # Train a model using best params, using the whole dataset this time
-        predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
+        predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions)
 
         blacklist_C_1_day = create_blacklist(predictions_1_day, ips)
 
@@ -209,7 +209,7 @@ else:
         X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
         # Find best params
-        best_params = find_best_param(X_train, X_test, y_train, y_test)
+        # best_params = find_best_param(X_train, X_test, y_train, y_test)
 
         # Count how many days of data we have in combined data
         first_day_for_predictions = load_data(new_24_hour_data)
@@ -234,7 +234,7 @@ else:
                 data_no_label = add_row(data_no_label)
                 # Create a list of ips in the dataframe
                 data_ips = data_frame['SrcAddr'].tolist()
-                predictions = train_on_complete_data(X_all, y_all, data_no_label, best_params)
+                predictions = train_on_complete_data(X_all, y_all, data_no_label)
                 blacklist = list(set(create_blacklist(predictions, data_ips)))
                 file = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatenated_' + str(x) + \
                          '_day/' + date + '_rf_concatenated_backlist_' + str(x) + '_day.csv'
