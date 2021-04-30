@@ -170,18 +170,11 @@ else:
         y_all, X_all = separate_labels_data(c_data_new)
         X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
-        # Process the data we will be predicting on
         first_day_for_predictions = process_old_data(new_24_hour_data)
 
         first_day_for_ips = load_data(new_24_hour_data)
         ips = extract_ips_from_pandas_dataframe(first_day_for_ips)
 
-        # Train a model and find good paramaters
-        #best_params = find_best_param(X_train, X_test, y_train, y_test)
-        # with open(AIP_output_data_directory + "/paramaters.txt", "a") as myfile:
-        #    myfile.write(best_params)
-
-        # Train a model using best params, using the whole dataset this time
         predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions)
 
         blacklist_C_1_day = create_blacklist(predictions_1_day, ips)
@@ -200,7 +193,9 @@ else:
         combined_data = combine_data_pandas(c_data_historical, c_data_new)
         if days_in_historical_data - 1 > 30:
             lines_to_drop = len(combined_data)//30
+            print('Before Drop: ', len(combined_data))
             combined_data.drop(pd.Series(np.arange(0, lines_to_drop, 1)))
+            print('After Drop: ', len(combined_data))
             print("Dropped", lines_to_drop, ' lines')
             with open(AIP_output_data_directory + '/ML_Model_Data/dropped_lines.txt', "a") as myfile:
                 myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining\n')
@@ -242,59 +237,6 @@ else:
                          '_day/' + date + '_rf_concatenated_backlist_' + str(x) + '_day.csv'
                 print('Writing to: ', file)
                 write_blacklist_to_file(file, blacklist)
-
-        # write_blacklist_to_file(C_model_output_1_day, list_of_blacklists[0])
-        # print('Creating blacklist from 1 day of data')
-        # if len(list_of_blacklists) >= 2:
-        #     write_blacklist_to_file(C_model_output_2_day, list_of_blacklists[1])
-        #     print('Creating blacklist from 2 days of data')
-        # if len(list_of_blacklists) >= 3:
-        #     write_blacklist_to_file(C_model_output_3_day, list_of_blacklists[2])
-        #     print('Creating blacklist from 3 days of data')
-        # if len(list_of_blacklists) >= 4:
-        #     write_blacklist_to_file(C_model_output_4_day, list_of_blacklists[3])
-        #     print('Creating blacklist from 4 days of data')
-        # if len(list_of_blacklists) >= 5:
-        #     write_blacklist_to_file(C_model_output_5_day, list_of_blacklists[4])
-        #     print('Creating blacklist from 5 days of data')
-        # if len(list_of_blacklists) >= 6:
-        #     write_blacklist_to_file(C_model_output_6_day, list_of_blacklists[5])
-        #     print('Creating blacklist from 6 days of data')
-        # if len(list_of_blacklists) >= 7:
-        #     write_blacklist_to_file(C_model_output_7_day, list_of_blacklists[6])
-        #     print('Creating blacklist from 7 days of data')
-        # if len(list_of_blacklists) >= 8:
-        #     write_blacklist_to_file(C_model_output_8_day, list_of_blacklists[7])
-        #     print('Creating blacklist from 8 days of data')
-        # if len(list_of_blacklists) >= 9:
-        #     write_blacklist_to_file(C_model_output_9_day, list_of_blacklists[8])
-        #     print('Creating blacklist from 9 days of data')
-        # if len(list_of_blacklists) >= 10:
-        #     write_blacklist_to_file(C_model_output_10_day, list_of_blacklists[9])
-        #     print('Creating blacklist from 10 days of data')
-
-
-        # Process the data we will be predicting on
-        # first_day_for_predictions = process_old_data(new_24_hour_data)
-        # second_day_for_predictions = process_old_data(previous_24_hour_data)
-        # two_day_combined_data = combine_data_pandas(first_day_for_predictions, second_day_for_predictions)
-        #
-        # first_day_for_ips = load_data(new_24_hour_data)
-        # second_day_for_ips = load_data(previous_24_hour_data)
-        # two_day_combined_data_ips = combine_data_pandas(first_day_for_ips, second_day_for_ips)
-        # one_day_ips = extract_ips_from_pandas_dataframe(first_day_for_ips)
-        # two_day_ips = extract_ips_from_pandas_dataframe(two_day_combined_data_ips)
-
-
-        # Train a model using best params, using the whole dataset this time
-        # predictions_1_day = train_on_complete_data(X_all, y_all, first_day_for_predictions, best_params)
-        # predictions_2_day = train_on_complete_data(X_all, y_all, two_day_combined_data, best_params)
-        #
-        # blacklist_C_1_day = create_blacklist(predictions_1_day, one_day_ips)
-        # blacklist_C_2_day = create_blacklist(predictions_2_day, two_day_ips)
-
-        # write_blacklist_to_file(C_model_output_1_day, blacklist_C_1_day)
-        # write_blacklist_to_file(C_model_output_2_day, blacklist_C_2_day)
 
         combined_data.to_csv(concatenated_data_labeled, index=False)
 
