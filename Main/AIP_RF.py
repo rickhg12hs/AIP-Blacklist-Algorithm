@@ -190,17 +190,18 @@ else:
         c_data_historical = load_data(concatenated_data_labeled)
         c_data_new = load_data(previous_24_hour_data_labeled)
         c_data_new = add_row(c_data_new)
-        combined_data = combine_data_pandas(c_data_historical, c_data_new)
-        if days_in_historical_data - 1 > 30:
-            lines_to_drop = len(combined_data)//30
-            print('Before Drop: ', len(combined_data))
-            combined_data.drop(pd.Series(np.arange(0, lines_to_drop, 1)))
+        all_data = combine_data_pandas(c_data_historical, c_data_new)
+        if days_in_historical_data - 1 > 31:
+            lines_to_drop = len(all_data)//31
+            print('Before Drop: ', len(all_data))
+            combined_data = all_data.drop(pd.Series(list(np.arange(0, lines_to_drop, 1))))
             print('After Drop: ', len(combined_data))
             print("Dropped", lines_to_drop, ' lines')
             with open(AIP_output_data_directory + '/ML_Model_Data/dropped_lines.txt', "a") as myfile:
                 myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining\n')
         else:
             print("Days in Data: ", days_in_historical_data)
+            combined_data = all_data
 
         y_all, X_all = separate_labels_data(combined_data)
         X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
