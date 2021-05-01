@@ -191,19 +191,19 @@ else:
         c_data_new = load_data(previous_24_hour_data_labeled)
         c_data_new = add_row(c_data_new)
         all_data = combine_data_pandas(c_data_historical, c_data_new)
-        if days_in_historical_data - 1 > 31:
-            lines_to_drop = len(all_data)//31
-            print('Before Drop: ', len(all_data))
-            combined_data = all_data.drop(pd.Series(list(np.arange(0, lines_to_drop, 1))))
-            print('After Drop: ', len(combined_data))
-            print("Dropped", lines_to_drop, ' lines')
-            with open(AIP_output_data_directory + '/ML_Model_Data/dropped_lines.txt', "a") as myfile:
-                myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining\n')
-        else:
-            print("Days in Data: ", days_in_historical_data)
-            combined_data = all_data
+        # if days_in_historical_data - 1 > 31:
+        #     lines_to_drop = len(all_data)//31
+        #     print('Before Drop: ', len(all_data))
+        #     combined_data = all_data.drop(pd.Series(list(np.arange(0, lines_to_drop, 1))))
+        #     print('After Drop: ', len(combined_data))
+        #     print("Dropped", lines_to_drop, ' lines')
+        #     with open(AIP_output_data_directory + '/ML_Model_Data/dropped_lines.txt', "a") as myfile:
+        #         myfile.write(str(date) + ": Dropped" + str(lines_to_drop) + ' lines' + ': ' + str(len(combined_data)) + ' lines remaining\n')
+        # else:
+        #     print("Days in Data: ", days_in_historical_data)
+        #     combined_data = all_data
 
-        y_all, X_all = separate_labels_data(combined_data)
+        y_all, X_all = separate_labels_data(all_data)
         X_train, X_test, y_train, y_test = bin_data(y_all, X_all)
 
         # Find best params
@@ -211,7 +211,7 @@ else:
 
         # Count how many days of data we have in combined data
         first_day_for_predictions = load_data(new_24_hour_data)
-        combined_data_for_predicting = combine_data_pandas(combined_data.loc[:, ~combined_data.columns.isin(['Label'])],
+        combined_data_for_predicting = combine_data_pandas(all_data.loc[:, ~all_data.columns.isin(['Label'])],
                                                            first_day_for_predictions)
         if days_in_historical_data - 1 > 30:
             average_flows_per_day = len(combined_data_for_predicting) / 30
@@ -239,7 +239,7 @@ else:
                 print('Writing to: ', file)
                 write_blacklist_to_file(file, blacklist)
 
-        combined_data.to_csv(concatenated_data_labeled, index=False)
+        all_data.to_csv(concatenated_data_labeled, index=False)
 
 with open(AIP_output_data_directory + "/log.txt", "a") as myfile:
     myfile.write('Total Runtime' + str(datetime.now() - startTime) + "\n")
