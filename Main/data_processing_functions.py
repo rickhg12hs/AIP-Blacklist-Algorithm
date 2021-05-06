@@ -1,12 +1,11 @@
 from inspect import getmembers, isfunction
 import linear_models
 import pandas as pd
-import csv
 from sklearn.model_selection import train_test_split
 import operator
-import os
 from datetime import datetime
 from whitelist_module import *
+
 
 def list_method_A_functions():
     functions_list = [o[0] for o in getmembers(linear_models) if isfunction(o[1])]
@@ -18,6 +17,7 @@ def list_method_A_functions():
             dictionary_of_options[running_total] = function
             running_total += 1
     return dictionary_of_options
+
 
 def list_method_B_functions():
     functions_list = [o[0] for o in getmembers(linear_models) if isfunction(o[1])]

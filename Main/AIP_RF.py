@@ -102,7 +102,7 @@ else:
         print('Number of total flows: ', len(combined_data_for_predicting))
         for x in range(1, 26, 3):
             if int(days_in_historical_data) >= x:
-                print('Predicing on ', x, 'days of data')
+                print('Predicting on ', x, ' days of data')
                 # Calculate number of data frames to extract
                 number_of_data_frames = int(x * average_flows_per_day)
                 print('Number of flows: ', number_of_data_frames)
@@ -118,7 +118,7 @@ else:
                 file = AIP_output_data_directory + '/Historical_Ratings/Random_Forest_Concatenated_' + str(x) + \
                          '_day/' + date + '_rf_concatenated_backlist_' + str(x) + '_day.csv'
                 print('Writing to: ', file)
-                write_blacklist_to_file(file, blacklist)
+                write_blacklist_to_file(file, blacklist, current_directory, AIP_output_data_directory)
 
         all_data.to_csv(concatenated_data_labeled, index=False)
 
