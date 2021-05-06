@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 import operator
 import os
 from datetime import datetime
+from whitelist_module import *
 
 def list_method_A_functions():
     functions_list = [o[0] for o in getmembers(linear_models) if isfunction(o[1])]
@@ -87,15 +88,27 @@ def open_sort_new_file(file):
                 continue
     return list_of_new_data_flows, list_of_IPs_in_new_data
 
-def write_blacklist_to_file(path_to_file, blacklist_ips):
+def write_blacklist_to_file(path_to_file, blacklist_ips, current_directory, AIPP_direcory):
+    list_of_whitelisted_nets, list_of_whitelisted_ips = load_whitelist()
+    asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', blacklist_ips)
+    with open(current_directory + '/Main/ASN/strings_to_check.csv', 'r') as read_obj:
+        csv_reader = csv.reader(read_obj)
+        list_of_good_organiations = list(csv_reader)
     with open(path_to_file, 'wt', newline ='') as new_file2:
         writer = csv.DictWriter(new_file2, fieldnames=['# RandomForest Blacklist'])
         writer.writeheader()
         writer1 = csv.DictWriter(new_file2, fieldnames=['IP address'])
         writer1.writeheader()
-        for number, ip in enumerate(blacklist_ips):
-            new_entry = {'IP address': ip}
-            writer1.writerows([new_entry])
+        for ip in blacklist_ips:
+            judgement3, entry = check_organization_strings(asn_info[ip], list_of_good_organiations)
+            if check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelisted_ips) == False and \
+                    check_if_ip_is_in_whitelisted_nets(ip, list_of_whitelisted_nets) == False and judgement3 == False:
+                new_entry = {'IP address': ip}
+                writer1.writerows([new_entry])
+            else:
+                with open(AIPP_direcory + "/log.txt", "a") as myfile:
+                    myfile.write('Found ' + str(ip) + ' in Whitelist. Deleting entry...' + "\n")
+                continue
 
 def open_sort_new_file_linear(b, list_of_new_files):
     list_of_new_data_flows = []
