@@ -112,9 +112,6 @@ python3 $directory_of_AIP/Main/select_linear_models.py
 
 for entry in $input_data_folder/*
 do
-   # Copy the aggregated data from the previous run to the ML model folder. This is the data for the aggregate ml model that
-   # needs to be labeled with the new data file, and then used for training.
-#   cp $output_folder/Absolute_Data.csv $output_folder/ML_Model_Data/aggregate_data.csv
 #   Copy the current new data file to the ML model folder, overridding the previous one. This will be used to label the aggregated data for the aggregated model,
 #   and used to label the previous unlabeled day data for the concatenation model.
    cp $entry $output_folder/ML_Model_Data/new_24_hour_data.csv
@@ -144,20 +141,11 @@ do
    python3 $directory_of_AIP/Main/AIP_RF.py
 #   Save the new_data.csv file to previous_unlabeled_data.csv, so that it can be used in the next run
    cp $output_folder/ML_Model_Data/new_24_hour_data.csv $output_folder/ML_Model_Data/previous_24_hour_data.csv
-#   Remove the current new data file from the folder. This is so that next this script is run, we dont loop thrpugh all the
-#   data files again
-#   number_of_stored_flows=$(wc -l $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
-#   echo $number_of_stored_flows
-#   while [ $number_of_stored_flows -gt 300000 ]
-#   do
-#     sed -i '2,2d' $output_folder/ML_Model_Data/concatenated_data_labeled.csv
-#     number_of_stored_flows=$(wc -l $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
-#     echo $number_of_stored_flows
-#   done
-    number_of_stored_flows=$(grep "" -c $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
-    while [[ $number_of_stored_flows -gt 350000 ]];
-    do
+
+   number_of_stored_flows=$(grep "" -c $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
+   while [[ $number_of_stored_flows -gt 350000 ]];
+   do
          sed -i '2,200d' concatenated_data_labeled.csv
          number_of_stored_flows=$(grep "" -c $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
-    done
+   done
 done
