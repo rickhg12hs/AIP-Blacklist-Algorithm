@@ -157,7 +157,7 @@ do
     number_of_stored_flows=$(grep "" -c $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
     while [[ $number_of_stored_flows -gt 350000 ]];
     do
-         sed -i '2,200d' concatenated_data_labeled.csv
+         sed -i '2,200d' $output_folder/ML_Model_Data/concatenated_data_labeled.csv
          number_of_stored_flows=$(grep "" -c $output_folder/ML_Model_Data/concatenated_data_labeled.csv)
     done
 done
