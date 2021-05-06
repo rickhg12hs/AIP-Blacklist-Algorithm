@@ -90,7 +90,7 @@ def open_sort_new_file(file):
 
 def write_blacklist_to_file(path_to_file, blacklist_ips, current_directory, AIPP_direcory):
     list_of_whitelisted_nets, list_of_whitelisted_ips = load_whitelist()
-    asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', blacklist_ips)
+    asn_info = get_ASN_data_2(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', blacklist_ips)
     with open(current_directory + '/Main/ASN/strings_to_check.csv', 'r') as read_obj:
         csv_reader = csv.reader(read_obj)
         list_of_good_organiations = list(csv_reader)
@@ -101,8 +101,8 @@ def write_blacklist_to_file(path_to_file, blacklist_ips, current_directory, AIPP
         writer1.writeheader()
         for ip in blacklist_ips:
             judgement3, entry = check_organization_strings(asn_info[ip], list_of_good_organiations)
-            if check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelisted_ips) == False and \
-                    check_if_ip_is_in_whitelisted_nets(ip, list_of_whitelisted_nets) == False and judgement3 == False:
+            if check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelisted_ips) is False and \
+                    check_if_ip_is_in_whitelisted_nets(ip, list_of_whitelisted_nets) is False and judgement3 is False:
                 new_entry = {'IP address': ip}
                 writer1.writerows([new_entry])
             else:

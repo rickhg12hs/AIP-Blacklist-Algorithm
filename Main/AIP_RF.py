@@ -71,7 +71,7 @@ else:
 
         blacklist_C_1_day = create_blacklist(predictions_1_day, ips)
 
-        write_blacklist_to_file(C_model_output_1_day, blacklist_C_1_day)
+        write_blacklist_to_file(C_model_output_1_day, blacklist_C_1_day, current_directory, AIP_output_data_directory)
 
         c_data_new.to_csv(concatenated_data_labeled, index=False)
     else:

@@ -31,6 +31,7 @@ def check_if_ip_is_in_whitelisted_nets(ip, list_of_whitelist_nets):
             return True
         else:
             continue
+    return False
 
 def check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelist_ips):
     for entry in list_of_whitelist_ips:
@@ -38,6 +39,7 @@ def check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelist_ips):
             return True
         else:
             continue
+    return False
 
 
 def get_ASN_data(asn_database, list_of_ips):
@@ -53,6 +55,22 @@ def get_ASN_data(asn_database, list_of_ips):
             except KeyError:
                 organization = ' '
         dictionary[ip[0]] = organization
+    return dictionary
+
+
+def get_ASN_data_2(asn_database, list_of_ips):
+    reader = maxminddb.open_database(asn_database)
+    dictionary = {}
+    for ip in list_of_ips:
+        data = reader.get(ip)
+        if data is None:
+            organization = ' '
+        else:
+            try:
+                organization = data['autonomous_system_organization']
+            except KeyError:
+                organization = ' '
+        dictionary[ip] = organization
     return dictionary
 
 
