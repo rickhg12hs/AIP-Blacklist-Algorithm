@@ -86,7 +86,7 @@ export output_folder
 export input_data_folder
 
 
-directory_of_AIP=$(dirname $(readlink -f "manual_run.sh"))
+directory_of_AIP=$(dirname $(readlink -f "manual_run_linear.sh"))
 
 python3 $directory_of_AIP/Main/select_linear_models.py
 
