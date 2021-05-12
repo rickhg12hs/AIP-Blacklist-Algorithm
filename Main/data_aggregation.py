@@ -27,11 +27,14 @@ def update_records_files(path_to_historical_data, list_of_known_new_IP_data, unk
 
                     updated_total_events = float(new_flow[1]) + float(absolute_flow[1])
                     updated_total_duration = float(absolute_flow[2]) + float(new_flow[2])
-                    updated_average_duration = (float(absolute_flow[3]) + float(new_flow[3])) / 2.0
+                    # updated_average_duration = (float(absolute_flow[3]) + float(new_flow[3])) / 2.0
+                    updated_average_duration = updated_total_duration / updated_total_events
                     updated_total_bytes = float(absolute_flow[4]) + float(new_flow[4])
-                    updated_average_bytes = (float(absolute_flow[5]) + float(new_flow[5])) / 2.0
+                    # updated_average_bytes = (float(absolute_flow[5]) + float(new_flow[5])) / 2.0
+                    updated_average_bytes = updated_total_bytes / updated_total_events
                     updated_total_packets = float(absolute_flow[6]) + float(new_flow[6])
-                    updated_average_packets = (float(absolute_flow[7]) + float(new_flow[7])) / 2.0
+                    # updated_average_packets = (float(absolute_flow[7]) + float(new_flow[7])) / 2.0
+                    updated_average_packets = updated_total_packets / updated_total_events
                     updated_last_event = new_flow[9]
 
                     updated_entry = [new_flow[0], updated_total_events, updated_total_duration,
